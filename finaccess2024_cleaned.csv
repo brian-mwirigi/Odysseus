@@ -3005,7 +3005,10 @@ Meru,Rural,Female,36-45,2,Primary completed,Divorced/separated,2400,Usage,Non-us
 Nyamira,Rural,Male,Above 55,1,Secondary completed,Married/Living with partner,1000,Non-usage,Non-usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,No,No,Worsened,Two correct,3,Relevance/Suitability,Without Disability
 Nakuru,Rural,Male,36-45,2,Secondary completed,Married/Living with partner,2500,Usage,Usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,No,Yes,No,No,No,Worsened,All correct,8,No barrier,Without Disability
 Machakos,Rural,Male,36-45,6,Some primary,Married/Living with partner,31000,Usage,Non-usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,Yes,Yes,Yes,Yes,Yes,Improved,All correct,4,Relevance/Suitability,Without Disability
+<<<<<<< HEAD
 Machakos,Rural,Male,Above 55,7,Some primary,Don't know   (DO NOT READ OUT),10000,Usage,Usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,No,Yes,Yes,Yes,Yes,Worsened,Two correct,7,Affordability,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Wajir,Rural,Male,18-25,9,None,Single/Never Married,300,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,No,No,Yes,No,Yes,No,No,Worsened,Two correct,1,Affordability,Without Disability
 Nairobi City,Urban,Female,36-45,7,Primary completed,Married/Living with partner,13000,Usage,Usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,No,Yes,Yes,Yes,No,No,Worsened,All correct,8,No barrier,Without Disability
 Narok,Rural,Male,Above 55,6,None,Married/Living with partner,5000,Non-usage,Non-usage,Non-usage,Non-usage,No,Non-usage,No,Phone ownership,No,No,No,Yes,Yes,No,No,Worsened,None correct,0,Affordability,With Disability
@@ -6307,7 +6310,10 @@ Makueni,Rural,Female,Above 55,2,Primary completed,Widowed,3000,Non-usage,Usage,N
 Machakos,Rural,Male,26-35,1,Secondary completed,Divorced/separated,1000,Usage,Non-usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,No,No,Worsened,All correct,4,Affordability,Without Disability
 Murang'a,Urban,Female,Above 55,3,Some primary,Divorced/separated,2000,Non-usage,Non-usage,Non-usage,Usage,Yes,Non-usage,No,Phone ownership,No,No,No,No,No,No,No,Worsened,All correct,1,Awareness,With Disability
 Samburu,Rural,Female,36-45,7,None,Married/Living with partner,15000,Usage,Usage,Usage,Usage,No,Usage,Yes,No barrier,Yes,Yes,No,No,No,Yes,Yes,Stayed the same,One correct,6,Access,Without Disability
+<<<<<<< HEAD
 Kwale,Rural,Male,46-55,9,Some primary,Don't know   (DO NOT READ OUT),500,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,No,No,Yes,Yes,No,Worsened,All correct,1,Affordability,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Makueni,Rural,Female,46-55,4,Primary completed,Married/Living with partner,5000,Usage,Usage,Non-usage,Usage,Yes,Usage,Yes,No barrier,Yes,Yes,No,No,No,No,No,Worsened,Two correct,6,No barrier,Without Disability
 Bungoma,Urban,Female,18-25,10,Secondary completed,Single/Never Married,6000,Usage,Non-usage,Non-usage,Usage,Yes,Usage,Yes,No barrier,No,Yes,Yes,No,Yes,Yes,Yes,Stayed the same,All correct,4,Access,Without Disability
 Kisumu,Urban,Female,18-25,5,Some primary,Married/Living with partner,6000,Non-usage,Usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Stayed the same,Two correct,4,Affordability,Without Disability
@@ -7711,7 +7717,10 @@ Machakos,Rural,Male,18-25,6,Some secondary,Single/Never Married,300,Non-usage,No
 Kakamega,Urban,Female,16-17,6,Primary completed,Single/Never Married,300,Non-usage,Non-usage,Non-usage,Non-usage,No,Non-usage,No,Phone ownership,No,No,No,No,Yes,No,No,Stayed the same,One correct,0,Eligibility,Without Disability
 Siaya,Rural,Female,Above 55,1,None,Widowed,1000,Non-usage,Non-usage,Non-usage,Usage,Yes,Usage,Yes,Phone ownership,No,Yes,No,Yes,Yes,No,No,Worsened,One correct,1,Affordability,Without Disability
 Kisumu,Rural,Female,26-35,5,Primary completed,Married/Living with partner,10000,Non-usage,Usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,Yes,No,Yes,Yes,Yes,Yes,Worsened,Two correct,4,Affordability,Without Disability
+<<<<<<< HEAD
 Bungoma,Rural,Male,Above 55,4,Don't know (DO NOT READ OUT),Married/Living with partner,1000,Non-usage,Non-usage,Usage,Non-usage,No,Usage,Yes,No barrier,No,No,Yes,Yes,Yes,No,No,Improved,None correct,4,Affordability,With Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Marsabit,Rural,Female,Above 55,3,None,Widowed,6000,Non-usage,Usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,No,No,Yes,Yes,Yes,Worsened,One correct,3,Access,Without Disability
 Siaya,Rural,Female,46-55,8,Primary completed,Married/Living with partner,75000,Non-usage,Usage,Usage,Non-usage,Yes,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,Yes,Yes,Worsened,All correct,5,Affordability,Without Disability
 Murang'a,Rural,Female,36-45,3,Primary completed,Single/Never Married,5000,Non-usage,Non-usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,No,No,Yes,Yes,Yes,No,Worsened,Two correct,2,Affordability,Without Disability
@@ -10512,7 +10521,10 @@ Meru,Rural,Female,26-35,4,Primary completed,Married/Living with partner,6000,Usa
 Nyeri,Rural,Female,46-55,4,Some secondary,Married/Living with partner,3000,Non-usage,Usage,Usage,Usage,No,Usage,Yes,No barrier,Yes,No,No,Yes,Yes,No,No,Worsened,All correct,6,No barrier,Without Disability
 Samburu,Rural,Female,46-55,4,None,Widowed,5600,Non-usage,Non-usage,Non-usage,Usage,Yes,Usage,Yes,No barrier,No,No,No,No,No,Yes,No,Improved,Two correct,3,No barrier,Without Disability
 Nyeri,Rural,Female,46-55,1,Primary completed,Divorced/separated,500,Usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,Yes,No,No,Yes,No,Worsened,All correct,5,No barrier,Without Disability
+<<<<<<< HEAD
 Bungoma,Rural,Male,36-45,6,Completed technical training after secondary school,Don't know   (DO NOT READ OUT),45000,Usage,Non-usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,No,No,Yes,Yes,Worsened,All correct,8,No barrier,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Nakuru,Urban,Male,26-35,1,Primary completed,Single/Never Married,15000,Usage,Usage,Usage,Usage,Yes,Usage,Yes,No barrier,Yes,Yes,Yes,No,Yes,No,No,Stayed the same,Two correct,8,Relevance/Suitability,Without Disability
 Bomet,Rural,Female,36-45,7,Some primary,Married/Living with partner,10000,Non-usage,Usage,Usage,Usage,Yes,Usage,Yes,No barrier,Yes,No,Yes,Yes,Yes,Yes,No,Improved,All correct,6,Relevance/Suitability,Without Disability
 Embu,Rural,Female,Above 55,1,None,Widowed,2000,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,No,No,Yes,No,No,Worsened,One correct,2,No barrier,Without Disability
@@ -13193,7 +13205,10 @@ Nyamira,Urban,Female,Above 55,1,University completed,Widowed,15000,Usage,Non-usa
 Kirinyaga,Rural,Male,18-25,1,Secondary completed,Single/Never Married,12000,Usage,Non-usage,Usage,Non-usage,Yes,Usage,Yes,No barrier,Yes,No,Yes,No,Yes,Yes,No,Stayed the same,All correct,7,No barrier,Without Disability
 Nakuru,Urban,Male,18-25,2,Some technical training after secondary school,Married/Living with partner,12000,Usage,Usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,No,No,No,Yes,No,No,Stayed the same,Two correct,6,Affordability,Without Disability
 Samburu,Urban,Female,26-35,6,Some secondary,Single/Never Married,4000,Usage,Non-usage,Usage,Non-usage,Yes,Usage,Yes,No barrier,Yes,No,No,Yes,Yes,Yes,No,Stayed the same,Two correct,5,Affordability,Without Disability
+<<<<<<< HEAD
 Kajiado,Urban,Female,36-45,3,Primary completed,Don't know   (DO NOT READ OUT),5000,Usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,Yes,No,Worsened,Two correct,6,No barrier,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Meru,Urban,Female,26-35,3,Primary completed,Single/Never Married,10000,Usage,Usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,No,No,No,No,Yes,No,Stayed the same,One correct,7,No barrier,Without Disability
 Nyandarua,Rural,Female,18-25,3,Secondary completed,Single/Never Married,50000,Non-usage,Usage,Usage,Usage,No,Usage,Yes,Eligibility,No,No,No,Yes,Yes,No,No,Worsened,All correct,4,Relevance/Suitability,Without Disability
 West Pokot,Rural,Male,46-55,6,None,Married/Living with partner,4500,Non-usage,Non-usage,Non-usage,Usage,Yes,Non-usage,No,Phone ownership,No,No,No,Yes,Yes,Yes,Yes,Worsened,None correct,1,Awareness,Without Disability
@@ -13461,7 +13476,10 @@ Turkana,Rural,Female,18-25,8,None,Divorced/separated,1000,Non-usage,Non-usage,No
 Kajiado,Rural,Female,26-35,4,Primary completed,Married/Living with partner,24000,Usage,Usage,Usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,Yes,Yes,Worsened,Two correct,7,No barrier,Without Disability
 Marsabit,Urban,Female,26-35,2,Primary completed,Married/Living with partner,5000,Non-usage,Usage,Non-usage,Usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Stayed the same,One correct,4,Relevance/Suitability,Without Disability
 Elgeyo-Marakwet,Rural,Male,18-25,10,Secondary completed,Single/Never Married,30000,Non-usage,Non-usage,Usage,Non-usage,Yes,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Worsened,All correct,3,Eligibility,Without Disability
+<<<<<<< HEAD
 Migori,Rural,Female,18-25,5,Some secondary,Don't know   (DO NOT READ OUT),200,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,Phone ownership,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Improved,Two correct,0,Eligibility,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Samburu,Rural,Female,36-45,8,None,Married/Living with partner,3000,Non-usage,Non-usage,Usage,Usage,Yes,Usage,No,Phone ownership,Yes,Yes,No,No,No,Yes,No,Stayed the same,Two correct,4,Access,Without Disability
 Murang'a,Rural,Male,36-45,1,Some primary,Divorced/separated,1500,Non-usage,Non-usage,Usage,Usage,No,Usage,Yes,No barrier,Yes,No,No,Yes,No,No,No,Stayed the same,Two correct,4,Affordability,Without Disability
 Machakos,Urban,Male,18-25,1,Secondary completed,Single/Never Married,3000,Usage,Non-usage,Usage,Usage,Yes,Usage,Yes,No barrier,Yes,Yes,No,No,No,No,No,Worsened,All correct,5,Affordability,Without Disability
@@ -16582,7 +16600,10 @@ Narok,Rural,Male,26-35,11,Secondary completed,Married/Living with partner,30000,
 Kakamega,Rural,Female,26-35,4,Primary completed,Married/Living with partner,200,Non-usage,Non-usage,Usage,Usage,Yes,Usage,No,Phone ownership,No,Yes,No,Yes,No,No,No,Worsened,Two correct,2,Relevance/Suitability,Without Disability
 Embu,Rural,Female,18-25,3,Some secondary,Single/Never Married,1000,Non-usage,Non-usage,Usage,Non-usage,Yes,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,No,No,Improved,All correct,3,Affordability,Without Disability
 Nyamira,Rural,Female,Above 55,2,Secondary completed,Single/Never Married,2000,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,No,No,Worsened,Two correct,1,Affordability,Without Disability
+<<<<<<< HEAD
 Nakuru,Rural,Male,18-25,2,Don't know (DO NOT READ OUT),Single/Never Married,5000,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,No,No,Worsened,All correct,1,Affordability,Without Disability
+=======
+>>>>>>> b81bf48c78f5f75613d14c0607a35a81583c01c0
 Nyandarua,Rural,Female,26-35,4,Secondary completed,Single/Never Married,8000,Usage,Usage,Usage,Usage,No,Usage,Yes,No barrier,Yes,No,Yes,Yes,No,Yes,No,Improved,All correct,11,No barrier,Without Disability
 Kwale,Rural,Female,36-45,6,Some primary,Single/Never Married,5000,Non-usage,Non-usage,Usage,Usage,Yes,Usage,Yes,No barrier,Yes,Yes,No,Yes,No,Yes,No,Worsened,One correct,3,Affordability,Without Disability
 Marsabit,Urban,Male,26-35,7,Primary completed,Married/Living with partner,9000,Non-usage,Non-usage,Non-usage,Non-usage,No,Usage,Yes,No barrier,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Worsened,All correct,3,Affordability,Without Disability
