@@ -469,6 +469,20 @@ cv_scores = cross_val_score(
 print(f"  Fold scores: {[f'{s:.4f}' for s in cv_scores]}")
 print(f"  Mean F1:     {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
 
+# ═══════════════════════════════════════════════════════════════════════
+# PHASE 11: EXPORT MODEL & PREDICTIONS FOR JUDGES
+# ═══════════════════════════════════════════════════════════════════════
+import joblib
+joblib.dump(best_model, 'odysseus_final_model.pkl')
+print("\n[✓] Model successfully saved to 'odysseus_final_model.pkl'")
+
+results_df = pd.DataFrame({
+    'True_Financial_Status': y_test,
+    'Predicted_Financial_Status': y_pred_final
+})
+results_df.to_csv('final_predictions.csv', index=False)
+print("[✓] Blind test predictions saved to 'final_predictions.csv'")
+
 print(f"\n{'='*70}")
 print(f"PIPELINE COMPLETE")
 print(f"Final model: {best_name}")
