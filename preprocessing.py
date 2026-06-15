@@ -26,16 +26,16 @@ def load_and_preprocess():
     X['Sex'] = (X['Sex'] == 'Male').astype(int)
     X['has_disability'] = (X['has_disability'] == 'With Disability').astype(int)
 
-    # Ordinal encoding
+    # Ordinal encoding with fallback for unknown categories
     X['Age'] = X['Age'].map({v: i for i, v in enumerate(
-        ['16-17', '18-25', '26-35', '36-45', '46-55', 'Above 55'])})
+        ['16-17', '18-25', '26-35', '36-45', '46-55', 'Above 55'])}).fillna(-1)
     X['education_level'] = X['education_level'].map({v: i for i, v in enumerate([
         'No formal education', 'Some primary', 'Primary completed', 'Some secondary',
         'Secondary completed', 'Some technical training after secondary school',
         'Completed technical training after secondary school',
-        'Some university', 'University completed'])})
+        'Some university', 'University completed'])}).fillna(-1)
     X['fl_score'] = X['fl_score'].map({v: i for i, v in enumerate(
-        ['None correct', 'One correct', 'Two correct', 'All correct'])})
+        ['None correct', 'One correct', 'Two correct', 'All correct'])}).fillna(-1)
 
     # Engineered features
     X['log_income'] = np.log1p(X['monthly_income'])
@@ -54,12 +54,8 @@ def load_and_preprocess():
     X['digital_access'] = X['mobile_money_access'] * X['mobile_ownership_1']
     X['financial_capability'] = X['education_level'] * X['fl_score']
 
-    # Target encoding for county
-    county_worsened_rate = (y == 'Worsened').groupby(X['county']).mean()
-    county_improved_rate = (y == 'Improved').groupby(X['county']).mean()
-    X['county_worsened_rate'] = X['county'].map(county_worsened_rate)
-    X['county_improved_rate'] = X['county'].map(county_improved_rate)
-    X['county_freq'] = X['county'].map(X['county'].value_counts(normalize=True))
+    # We remove target encoding here to prevent target leakage.
+    # The models will rely on the one-hot encoded county columns instead.
 
     # One-hot for remaining nominal columns
     X = pd.get_dummies(X, columns=['marital_status', 'barriers_mobile_money', 'barriers_bank', 'county'], drop_first=True)
