@@ -13,6 +13,9 @@ print(f"\nSTEP 1 — Duplicates: Found {dupes_before}, dropped them. Rows now: {
 
 df['education_level'] = df['education_level'].str.replace('"', '', regex=False).str.strip()
 
+# Rename 'None' to 'No formal education' because pandas reads the string "None"
+# as a null/NaN value when loading from CSV, which silently destroys 3072 rows
+df['education_level'] = df['education_level'].replace('None', 'No formal education')
 
 junk_education = [
     'Refused to Answer (DO NOT READ OUT)',
