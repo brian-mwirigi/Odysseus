@@ -351,10 +351,10 @@ fig, ax = plt.subplots(figsize=(8, 6))
 ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=class_names, cmap='Blues', ax=ax)
 ax.set_title(f'{best_name} (F1={f1_final:.4f})')
 plt.tight_layout()
-plt.savefig('confusion_matrix.png', dpi=150)
+plt.savefig('visualizations/confusion_matrix.png', dpi=150)
 plt.close()
 
-joblib.dump(best_model, 'odysseus_final_model.pkl')
+joblib.dump(best_model, 'models/odysseus_final_model.pkl')
 te_maps_save = {col: {'means': train_te_maps[col]['means'], 'overall': train_te_maps[col]['overall']} for col in cat_cols_to_te}
 
 joblib.dump({
@@ -366,8 +366,8 @@ joblib.dump({
     'te_maps': te_maps_save, 'cat_cols_to_te': cat_cols_to_te,
     'worsened_cls': worsened_cls, 'threshold_weights': threshold_weights,
     'best_name': best_name, 'meta_lr': meta_lr, 'best_cb_params': best_cb,
-}, 'pipeline_state.pkl')
+}, 'models/pipeline_state.pkl')
 
-pd.DataFrame({'True': y_test.ravel(), 'Predicted': y_pred.ravel()}).to_csv('final_predictions.csv', index=False)
-pd.DataFrame(final_lb, columns=['Model', 'Score']).to_csv('model_leaderboard.csv', index=False)
+pd.DataFrame({'True': y_test.ravel(), 'Predicted': y_pred.ravel()}).to_csv('data/final_predictions.csv', index=False)
+pd.DataFrame(final_lb, columns=['Model', 'Score']).to_csv('data/model_leaderboard.csv', index=False)
 print("\nSaved artifacts successfully.")

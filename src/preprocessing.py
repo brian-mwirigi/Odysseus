@@ -7,7 +7,7 @@ import numpy as np
 
 
 def load_and_preprocess():
-    df = pd.read_csv('finaccess2024_cleaned.csv')
+    df = pd.read_csv('data/finaccess2024_cleaned.csv')
     assert df.shape[0] == 20848 and df.isnull().sum().sum() == 0
 
     y = df['financial_status']

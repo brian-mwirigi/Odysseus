@@ -38,7 +38,7 @@ import joblib""")
 md("## 2. Data Cleaning\n\nClean the raw FinAccess 2024 survey data: remove duplicates, fix education level, handle MNAR missing values in barriers_bank, standardize text.")
 
 code("""# --- Data Cleaning ---
-df = pd.read_csv('finaccess2024_datasprint.csv')
+df = pd.read_csv('data/finaccess2024_datasprint.csv')
 print(f"Loaded raw data: {df.shape[0]} rows, {df.shape[1]} columns")
 
 # Drop duplicates
@@ -75,14 +75,14 @@ text_cols = df.select_dtypes(include='object').columns
 for col in text_cols:
     df[col] = df[col].str.strip()
 
-df.to_csv('finaccess2024_cleaned.csv', index=False)
+df.to_csv('data/finaccess2024_cleaned.csv', index=False)
 print(f"\\nSaved cleaned data: {df.shape[0]} rows, {df.shape[1]} columns")
 print(f"Target distribution:\\n{df['financial_status'].value_counts(normalize=True).round(3)}")""")
 
 md("## 3. Feature Engineering & Preprocessing\n\n28 raw features → 67 features after engineering:\n- Binary encoding for Yes/No columns\n- Ordinal encoding for Age, education_level, fl_score\n- Log transforms, ratio features, composite scores\n- Interaction terms (shock×defaulted, income×formal, etc.)\n- Frequency encoding for categoricals\n- Target encoding columns kept for ML pipeline (applied inside CV)")
 
 code("""def load_and_preprocess():
-    df = pd.read_csv('finaccess2024_cleaned.csv')
+    df = pd.read_csv('data/finaccess2024_cleaned.csv')
     assert df.shape[0] == 20848 and df.isnull().sum().sum() == 0
 
     y = df['financial_status']
@@ -175,7 +175,7 @@ print(f"Cat cols for TE: {cat_cols_to_te}")""")
 
 md("## 4. Exploratory Data Analysis")
 
-code("""df_eda = pd.read_csv('finaccess2024_cleaned.csv')
+code("""df_eda = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
@@ -200,7 +200,7 @@ for label in axes[2].get_xticklabels():
     label.set_rotation(0)
 
 plt.tight_layout()
-plt.savefig('eda_overview.png', dpi=150)
+plt.savefig('visualizations/eda_overview.png', dpi=150)
 plt.show()
 
 print(f"\\nKey Stats:")
@@ -491,12 +491,12 @@ fig, ax = plt.subplots(figsize=(8, 6))
 ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=class_names, cmap='Blues', ax=ax)
 ax.set_title(f'{best_name} (F1={f1_final:.4f})')
 plt.tight_layout()
-plt.savefig('confusion_matrix.png', dpi=150)
+plt.savefig('visualizations/confusion_matrix.png', dpi=150)
 plt.show()""")
 
 md("### 5i. Save Pipeline State")
 
-code("""joblib.dump(best_model, 'odysseus_final_model.pkl')
+code("""joblib.dump(best_model, 'models/odysseus_final_model.pkl')
 te_maps_save = {col: {'means': train_te_maps[col]['means'], 'overall': train_te_maps[col]['overall']} for col in cat_cols_to_te}
 joblib.dump({
     'X_test_final': X_test_final, 'y_test': y_test, 'y_pred': y_pred,
@@ -507,21 +507,21 @@ joblib.dump({
     'te_maps': te_maps_save, 'cat_cols_to_te': cat_cols_to_te,
     'worsened_cls': worsened_cls, 'threshold_weights': threshold_weights,
     'best_name': best_name, 'meta_lr': meta_lr, 'best_cb_params': best_cb,
-}, 'pipeline_state.pkl')
-pd.DataFrame({'True': y_test.ravel(), 'Predicted': y_pred.ravel()}).to_csv('final_predictions.csv', index=False)
-pd.DataFrame(final_lb, columns=['Model', 'Score']).to_csv('model_leaderboard.csv', index=False)
+}, 'models/pipeline_state.pkl')
+pd.DataFrame({'True': y_test.ravel(), 'Predicted': y_pred.ravel()}).to_csv('data/final_predictions.csv', index=False)
+pd.DataFrame(final_lb, columns=['Model', 'Score']).to_csv('data/model_leaderboard.csv', index=False)
 print("Saved artifacts successfully.")""")
 
 md("## 6. SHAP Explainability & Financial Vulnerability Index")
 
-code("""state = joblib.load('pipeline_state.pkl')
+code("""state = joblib.load('models/pipeline_state.pkl')
 X_test_s = state['X_test_final']
 X_full_s = state['X_all_final']
 y_full_s = state['y_full']
 trained_s = state['trained']
 threshold_weights_s = state['threshold_weights']
 best_name_s = state['best_name']
-df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+df_orig = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 shap_model = trained_s["CatBoost"]
 print(f"Using CatBoost for SHAP")
@@ -548,7 +548,7 @@ fig, ax = plt.subplots(figsize=(12, 8))
 shap.summary_plot(shap_list, X_sample, class_names=class_names, max_display=15, show=False, plot_type='bar')
 plt.title('Feature Importance Across All Classes (SHAP)', fontsize=14)
 plt.tight_layout()
-plt.savefig('shap_all_classes.png', dpi=150)
+plt.savefig('visualizations/shap_all_classes.png', dpi=150)
 plt.close()
 
 # Vulnerability Index
@@ -573,7 +573,7 @@ ax.set_ylabel('Number of People', fontsize=12)
 ax.set_title('Financial Vulnerability Distribution Across Kenya', fontsize=14)
 ax.legend()
 plt.tight_layout()
-plt.savefig('vulnerability_distribution.png', dpi=150)
+plt.savefig('visualizations/vulnerability_distribution.png', dpi=150)
 plt.close()
 
 # County analysis
@@ -595,17 +595,17 @@ ax.set_title('Financial Vulnerability by County', fontsize=14)
 ax.axvline(county_stats['avg_vulnerability'].mean(), color='black', linestyle='--', alpha=0.5)
 ax.invert_yaxis()
 plt.tight_layout()
-plt.savefig('county_vulnerability.png', dpi=150)
+plt.savefig('visualizations/county_vulnerability.png', dpi=150)
 plt.close()""")
 
 md("## 7. Policy Intervention Simulation")
 
-code("""state = joblib.load('pipeline_state.pkl')
+code("""state = joblib.load('models/pipeline_state.pkl')
 X_all_i = state['X_all_final']
 trained_i = state['trained']
 model_int = trained_i["CatBoost"]
 worsened_idx = class_names.index('Worsened')
-df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+df_orig = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 def get_vulnerability(X_data):
     return model_int.predict_proba(X_data)[:, worsened_idx] * 100
@@ -677,7 +677,7 @@ ax.set_xticklabels(names, fontsize=10)
 ax.legend()
 ax.set_ylim(0, max(befores) + 10)
 plt.tight_layout()
-plt.savefig('intervention_impact.png', dpi=150)
+plt.savefig('visualizations/intervention_impact.png', dpi=150)
 plt.show()
 
 for name, before, after, count, hr_before, hr_after in interventions:
@@ -685,11 +685,11 @@ for name, before, after, count, hr_before, hr_after in interventions:
 
 md("## 8. Persona Profiles & County Rankings")
 
-code("""state = joblib.load('pipeline_state.pkl')
+code("""state = joblib.load('models/pipeline_state.pkl')
 trained_v = state['trained']
 model_v = trained_v["CatBoost"]
 X_all_v = state['X_all_final']
-df = pd.read_csv('finaccess2024_cleaned.csv')
+df = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 proba = model_v.predict_proba(X_all_v)
 vuln = proba[:, class_names.index('Worsened')] * 100

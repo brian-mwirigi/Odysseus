@@ -14,7 +14,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-state = joblib.load('pipeline_state.pkl')
+state = joblib.load('models/pipeline_state.pkl')
 X_test_final = state['X_test_final']
 y_test = state['y_test']
 class_names = state['class_names']
@@ -31,7 +31,7 @@ best_name = state['best_name']
 county_means = te_maps.get('county', te_maps.get('county', {})).get('means', {})
 county_overall_mean = te_maps.get('county', {}).get('overall', 0.52)
 
-df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+df_orig = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 shap_model_name = "CatBoost"
 if shap_model_name not in trained:
@@ -188,7 +188,7 @@ ax.set_xticklabels(names, fontsize=10)
 ax.legend(fontsize=11)
 ax.set_ylim(0, max(befores) + 10)
 plt.tight_layout()
-plt.savefig('intervention_impact.png', dpi=150)
+plt.savefig('visualizations/intervention_impact.png', dpi=150)
 plt.close()
 print("\nSaved: intervention_impact.png")
 

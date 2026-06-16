@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-state = joblib.load('pipeline_state.pkl')
+state = joblib.load('models/pipeline_state.pkl')
 X_test = state['X_test_final']
 y_test = state['y_test']
 y_pred = state['y_pred']
@@ -28,7 +28,7 @@ y_full = state['y_full']
 threshold_weights = state['threshold_weights']
 best_name = state['best_name']
 
-df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+df_orig = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 
 def get_model_predictions(model_name, trained_dict, X_data, threshold_weights=None):
@@ -77,7 +77,7 @@ shap.summary_plot(shap_list, X_sample, class_names=class_names,
                   max_display=15, show=False, plot_type='bar')
 plt.title('Feature Importance Across All Classes (SHAP)', fontsize=14)
 plt.tight_layout()
-plt.savefig('shap_all_classes.png', dpi=150, bbox_inches='tight')
+plt.savefig('visualizations/shap_all_classes.png', dpi=150, bbox_inches='tight')
 plt.close()
 print("  Saved: shap_improved.png, shap_stayed_the_same.png, shap_worsened.png, shap_all_classes.png")
 
@@ -114,7 +114,7 @@ ax.set_ylabel('Number of People', fontsize=12)
 ax.set_title('Financial Vulnerability Distribution Across Kenya', fontsize=14)
 ax.legend(fontsize=11)
 plt.tight_layout()
-plt.savefig('vulnerability_distribution.png', dpi=150)
+plt.savefig('visualizations/vulnerability_distribution.png', dpi=150)
 plt.close()
 print("  Saved: vulnerability_distribution.png")
 
@@ -155,11 +155,11 @@ ax.axvline(county_stats['avg_vulnerability'].mean(), color='black', linestyle='-
 ax.legend()
 ax.invert_yaxis()
 plt.tight_layout()
-plt.savefig('county_vulnerability.png', dpi=150)
+plt.savefig('visualizations/county_vulnerability.png', dpi=150)
 plt.close()
 
-county_stats.to_csv('county_vulnerability.csv')
-df_orig[['county', 'vulnerability_score', 'financial_status']].to_csv('vulnerability_scores.csv', index=False)
+county_stats.to_csv('data/county_vulnerability.csv')
+df_orig[['county', 'vulnerability_score', 'financial_status']].to_csv('data/vulnerability_scores.csv', index=False)
 
 print("\n  Saved: county_vulnerability.png, county_vulnerability.csv, vulnerability_scores.csv")
 

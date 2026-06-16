@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import joblib
 
-state = joblib.load('pipeline_state.pkl')
+state = joblib.load('models/pipeline_state.pkl')
 X_test_final = state['X_test_final']
 y_test = state['y_test']
 class_names = state['class_names']
@@ -16,7 +16,7 @@ X_all = state['X_all_final']
 y_full = state['y_full']
 threshold_weights = state['threshold_weights']
 
-df = pd.read_csv('finaccess2024_cleaned.csv')
+df = pd.read_csv('data/finaccess2024_cleaned.csv')
 
 model = trained["CatBoost"]
 worsened_idx = class_names.index('Worsened')

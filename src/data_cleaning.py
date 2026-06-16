@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-df = pd.read_csv('finaccess2024_datasprint.csv')
+df = pd.read_csv('data/finaccess2024_datasprint.csv')
 print(f"Loaded raw data: {df.shape[0]} rows, {df.shape[1]} columns")
 
 
@@ -87,7 +87,7 @@ print(f"\n✓ education_level clean values:")
 for v in sorted(df['education_level'].unique()):
     print(f"  {repr(v):60s} count={int((df['education_level']==v).sum())}")
 
-output_path = 'finaccess2024_cleaned.csv'
+output_path = 'data/finaccess2024_cleaned.csv'
 df.to_csv(output_path, index=False)
 print(f"\n{'=' * 70}")
 print(f"SAVED cleaned data to: {output_path}")
