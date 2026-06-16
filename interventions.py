@@ -1,8 +1,11 @@
 """
 Policy Intervention Simulator & Persona Profiles - Team Odysseus
-This is the weapon nobody else has.
 
 It answers: "If we change X, what happens to financial vulnerability?"
+
+FIXED: Uses X_all_final from pipeline_state.pkl (already has county_worsened_rate,
+       county dropped, all preprocessing done) instead of load_and_preprocess()
+       which would return data incompatible with the trained models.
 """
 import pandas as pd
 import numpy as np
@@ -11,29 +14,43 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from preprocessing import load_and_preprocess
+state = joblib.load('pipeline_state.pkl')
+X_test_final = state['X_test_final']
+y_test = state['y_test']
+class_names = state['class_names']
+trained = state['trained']
+test_scores = state['test_scores']
+X_all = state['X_all_final']
+y_full = state['y_full']
+te_maps = state['te_maps']
+cat_cols_to_te = state['cat_cols_to_te']
+worsened_cls = state['worsened_cls']
+threshold_weights = state['threshold_weights']
+best_name = state['best_name']
 
-# Load everything
-X_test, y_test, y_pred, class_names, trained, results, X_full, y_full = joblib.load('pipeline_state.pkl')
+county_means = te_maps.get('county', te_maps.get('county', {})).get('means', {})
+county_overall_mean = te_maps.get('county', {}).get('overall', 0.52)
+
 df_orig = pd.read_csv('finaccess2024_cleaned.csv')
 
-# Use the winning CatBoost model
-cat_models = {n: s for n, s in results.items() if 'CatBoost' in n}
-model_name = max(cat_models, key=cat_models.get)
-model = trained[model_name]
+shap_model_name = "CatBoost"
+if shap_model_name not in trained:
+    shap_model_name = best_name.replace("+Threshold", "")
+model = trained[shap_model_name]
 worsened_idx = class_names.index('Worsened')
+print(f"Using {shap_model_name} (Test F1={test_scores.get(shap_model_name, 0):.4f})")
 
-X_all, y_all, _, _ = load_and_preprocess()
 
 def get_vulnerability(X_data):
     proba = model.predict_proba(X_data)
     return proba[:, worsened_idx] * 100
 
+
 baseline_scores = get_vulnerability(X_all)
 df_orig['baseline_vulnerability'] = baseline_scores
 
 # ===================================================================
-# INTERVENTION 1: Give mobile money to everyone who doesn't have it
+# INTERVENTION SIMULATIONS
 # ===================================================================
 print("=" * 70)
 print("POLICY INTERVENTION SIMULATIONS")
@@ -55,15 +72,15 @@ high_risk_after = (sim_scores[affected_mask] > 70).sum()
 
 print(f"\n1. GIVE MOBILE MONEY ACCESS TO ALL EXCLUDED ADULTS")
 print(f"   People affected: {affected_count}")
-print(f"   Avg vulnerability: {before:.1f} → {after:.1f} (Δ = {after-before:+.1f})")
-print(f"   High-risk count:   {high_risk_before} → {high_risk_after} (Δ = {high_risk_after-high_risk_before:+d})")
+print(f"   Avg vulnerability: {before:.1f} -> {after:.1f} (delta = {after-before:+.1f})")
+print(f"   High-risk count:   {high_risk_before} -> {high_risk_after} (delta = {high_risk_after-high_risk_before:+d})")
 interventions.append(("Mobile Money\nfor All", before, after, affected_count, high_risk_before, high_risk_after))
 
 # --- Financial Literacy ---
 X_sim = X_all.copy()
 affected_mask = df_orig['fl_score'].isin(['None correct', 'One correct'])
 affected_count = affected_mask.sum()
-X_sim.loc[affected_mask, 'fl_score'] = 3  # All correct
+X_sim.loc[affected_mask, 'fl_score'] = 3
 X_sim.loc[affected_mask, 'financial_capability'] = X_sim.loc[affected_mask, 'education_level'] * 3
 sim_scores = get_vulnerability(X_sim)
 before = baseline_scores[affected_mask].mean()
@@ -71,10 +88,10 @@ after = sim_scores[affected_mask].mean()
 high_risk_before = (baseline_scores[affected_mask] > 70).sum()
 high_risk_after = (sim_scores[affected_mask] > 70).sum()
 
-print(f"\n2. IMPROVE FINANCIAL LITERACY (low-scoring → all correct)")
+print(f"\n2. IMPROVE FINANCIAL LITERACY (low-scoring -> all correct)")
 print(f"   People affected: {affected_count}")
-print(f"   Avg vulnerability: {before:.1f} → {after:.1f} (Δ = {after-before:+.1f})")
-print(f"   High-risk count:   {high_risk_before} → {high_risk_after} (Δ = {high_risk_after-high_risk_before:+d})")
+print(f"   Avg vulnerability: {before:.1f} -> {after:.1f} (delta = {after-before:+.1f})")
+print(f"   High-risk count:   {high_risk_before} -> {high_risk_after} (delta = {high_risk_after-high_risk_before:+d})")
 interventions.append(("Financial Literacy\nProgram", before, after, affected_count, high_risk_before, high_risk_after))
 
 # --- Formal Savings ---
@@ -84,6 +101,7 @@ affected_count = affected_mask.sum()
 X_sim.loc[affected_mask, 'Savings_formal'] = 1
 X_sim.loc[affected_mask, 'total_formal_products'] = X_sim.loc[affected_mask, 'total_formal_products'] + 1
 X_sim.loc[affected_mask, 'total_products'] = X_sim.loc[affected_mask, 'total_products'] + 1
+X_sim.loc[affected_mask, 'no_savings_no_access'] = 0
 X_sim.loc[affected_mask, 'urban_x_formal'] = X_sim.loc[affected_mask, 'location_type'] * X_sim.loc[affected_mask, 'total_formal_products']
 sim_scores = get_vulnerability(X_sim)
 before = baseline_scores[affected_mask].mean()
@@ -93,8 +111,8 @@ high_risk_after = (sim_scores[affected_mask] > 70).sum()
 
 print(f"\n3. PROVIDE FORMAL SAVINGS ACCESS (bank/SACCO/MFI)")
 print(f"   People affected: {affected_count}")
-print(f"   Avg vulnerability: {before:.1f} → {after:.1f} (Δ = {after-before:+.1f})")
-print(f"   High-risk count:   {high_risk_before} → {high_risk_after} (Δ = {high_risk_after-high_risk_before:+d})")
+print(f"   Avg vulnerability: {before:.1f} -> {after:.1f} (delta = {after-before:+.1f})")
+print(f"   High-risk count:   {high_risk_before} -> {high_risk_after} (delta = {high_risk_after-high_risk_before:+d})")
 interventions.append(("Formal Savings\nAccess", before, after, affected_count, high_risk_before, high_risk_after))
 
 # --- Shock Protection (safety net) ---
@@ -104,6 +122,10 @@ affected_count = affected_mask.sum()
 X_sim.loc[affected_mask, 'experienced_shock'] = 0
 X_sim.loc[affected_mask, 'shock_vulnerable'] = 0
 X_sim.loc[affected_mask, 'age_x_shock'] = 0
+X_sim.loc[affected_mask, 'shock_x_defaulted'] = 0
+X_sim.loc[affected_mask, 'shock_no_resilience'] = 0
+X_sim.loc[affected_mask, 'shock_x_no_savings'] = 0
+X_sim.loc[affected_mask, 'disability_x_shock'] = 0
 sim_scores = get_vulnerability(X_sim)
 before = baseline_scores[affected_mask].mean()
 after = sim_scores[affected_mask].mean()
@@ -112,8 +134,8 @@ high_risk_after = (sim_scores[affected_mask] > 70).sum()
 
 print(f"\n4. SHOCK PROTECTION (safety net / insurance for those who experienced shocks)")
 print(f"   People affected: {affected_count}")
-print(f"   Avg vulnerability: {before:.1f} → {after:.1f} (Δ = {after-before:+.1f})")
-print(f"   High-risk count:   {high_risk_before} → {high_risk_after} (Δ = {high_risk_after-high_risk_before:+d})")
+print(f"   Avg vulnerability: {before:.1f} -> {after:.1f} (delta = {after-before:+.1f})")
+print(f"   High-risk count:   {high_risk_before} -> {high_risk_after} (delta = {high_risk_after-high_risk_before:+d})")
 interventions.append(("Shock Protection\n/ Insurance", before, after, affected_count, high_risk_before, high_risk_after))
 
 # --- Emergency Fund Access ---
@@ -122,7 +144,15 @@ affected_mask = df_orig['accessto_13k_1month'] == 'No'
 affected_count = affected_mask.sum()
 X_sim.loc[affected_mask, 'accessto_13k_1month'] = 1
 X_sim.loc[affected_mask, 'resilience_score'] = X_sim.loc[affected_mask, 'resilience_score'] + 1
-X_sim.loc[affected_mask, 'shock_vulnerable'] = ((X_sim.loc[affected_mask, 'experienced_shock'] == 1) & (X_sim.loc[affected_mask, 'resilience_score'] <= 1)).astype(int)
+X_sim.loc[affected_mask, 'shock_no_resilience'] = 0
+X_sim.loc[affected_mask, 'no_savings_no_access'] = (
+    (X_sim.loc[affected_mask, 'Savings_formal'] == 0) &
+    (X_sim.loc[affected_mask, 'accessto_13k_1month'] == 0)
+).astype(int)
+X_sim.loc[affected_mask, 'shock_vulnerable'] = (
+    (X_sim.loc[affected_mask, 'experienced_shock'] == 1) &
+    (X_sim.loc[affected_mask, 'resilience_score'] <= 1)
+).astype(int)
 sim_scores = get_vulnerability(X_sim)
 before = baseline_scores[affected_mask].mean()
 after = sim_scores[affected_mask].mean()
@@ -131,8 +161,8 @@ high_risk_after = (sim_scores[affected_mask] > 70).sum()
 
 print(f"\n5. EMERGENCY FUND ACCESS (ensure everyone can access KES 13k in 1 month)")
 print(f"   People affected: {affected_count}")
-print(f"   Avg vulnerability: {before:.1f} → {after:.1f} (Δ = {after-before:+.1f})")
-print(f"   High-risk count:   {high_risk_before} → {high_risk_after} (Δ = {high_risk_after-high_risk_before:+d})")
+print(f"   Avg vulnerability: {before:.1f} -> {after:.1f} (delta = {after-before:+.1f})")
+print(f"   High-risk count:   {high_risk_before} -> {high_risk_after} (delta = {high_risk_after-high_risk_before:+d})")
 interventions.append(("Emergency Fund\nAccess", before, after, affected_count, high_risk_before, high_risk_after))
 
 # --- Plot ---
@@ -170,12 +200,12 @@ print("PERSONA PROFILES")
 print("=" * 70)
 
 personas = [
-    ("Worsened", 2, "Those whose financial status deteriorated"),
-    ("Improved", 0, "Those whose financial status got better"),
-    ("Stayed the same", 1, "Those with no change"),
+    ("Worsened", "Those whose financial status deteriorated"),
+    ("Improved", "Those whose financial status got better"),
+    ("Stayed the same", "Those with no change"),
 ]
 
-for label, encoded, desc in personas:
+for label, desc in personas:
     subset = df_orig[df_orig['financial_status'] == label]
     print(f"\n--- TYPICAL PROFILE: '{label}' ({desc}) ---")
     print(f"  Most common age group:     {subset['Age'].mode().iloc[0]}")
@@ -194,40 +224,48 @@ for label, encoded, desc in personas:
 
 # --- County-specific intervention ---
 print(f"\n{'='*70}")
-print("TARGETED INTERVENTION: TANA RIVER COUNTY (Most Vulnerable)")
+print("TARGETED INTERVENTION: MOST VULNERABLE COUNTY")
 print("=" * 70)
 
-tana = df_orig[df_orig['county'] == 'Tana River']
-print(f"  Population in data:       {len(tana)}")
-print(f"  % Worsened:               {(tana['financial_status']=='Worsened').mean()*100:.1f}%")
-print(f"  % No mobile money:        {(tana['mobile_money_access']=='No').mean()*100:.1f}%")
-print(f"  % No formal savings:      {(tana['Savings_formal']=='Non-usage').mean()*100:.1f}%")
-print(f"  % Experienced shock:      {(tana['experienced_shock']=='Yes').mean()*100:.1f}%")
-print(f"  % Cannot access 13k:      {(tana['accessto_13k_1month']=='No').mean()*100:.1f}%")
-print(f"  Avg vulnerability score:  {tana['baseline_vulnerability'].mean():.1f}")
+county_vuln = df_orig.groupby('county')['baseline_vulnerability'].mean().sort_values(ascending=False)
+most_vulnerable_county = county_vuln.index[0]
+print(f"  Most vulnerable county: {most_vulnerable_county} (avg score={county_vuln.iloc[0]:.1f})")
 
-# Simulate: give Tana River everything
-X_tana = X_all.copy()
-tana_mask = df_orig['county'] == 'Tana River'
-X_tana.loc[tana_mask, 'mobile_money_access'] = 1
-X_tana.loc[tana_mask, 'Savings_formal'] = 1
-X_tana.loc[tana_mask, 'accessto_13k_1month'] = 1
-X_tana.loc[tana_mask, 'resilience_score'] = 3
-X_tana.loc[tana_mask, 'shock_vulnerable'] = 0
-X_tana.loc[tana_mask, 'total_formal_products'] = X_tana.loc[tana_mask, 'total_formal_products'] + 1
-X_tana.loc[tana_mask, 'total_products'] = X_tana.loc[tana_mask, 'total_products'] + 1
-X_tana.loc[tana_mask, 'digital_access'] = 1
+target = df_orig[df_orig['county'] == most_vulnerable_county]
+print(f"  Population in data:       {len(target)}")
+print(f"  % Worsened:               {(target['financial_status']=='Worsened').mean()*100:.1f}%")
+print(f"  % No mobile money:        {(target['mobile_money_access']=='No').mean()*100:.1f}%")
+print(f"  % No formal savings:      {(target['Savings_formal']=='Non-usage').mean()*100:.1f}%")
+print(f"  % Experienced shock:      {(target['experienced_shock']=='Yes').mean()*100:.1f}%")
+print(f"  % Cannot access 13k:      {(target['accessto_13k_1month']=='No').mean()*100:.1f}%")
+print(f"  Avg vulnerability score:  {target['baseline_vulnerability'].mean():.1f}")
 
-tana_after = get_vulnerability(X_tana)
-before_tana = baseline_scores[tana_mask].mean()
-after_tana = tana_after[tana_mask].mean()
-hr_before = (baseline_scores[tana_mask] > 70).sum()
-hr_after = (tana_after[tana_mask] > 70).sum()
+X_target = X_all.copy()
+target_mask = df_orig['county'] == most_vulnerable_county
+X_target.loc[target_mask, 'mobile_money_access'] = 1
+X_target.loc[target_mask, 'Savings_formal'] = 1
+X_target.loc[target_mask, 'accessto_13k_1month'] = 1
+X_target.loc[target_mask, 'resilience_score'] = 3
+X_target.loc[target_mask, 'shock_vulnerable'] = 0
+X_target.loc[target_mask, 'total_formal_products'] = X_target.loc[target_mask, 'total_formal_products'] + 1
+X_target.loc[target_mask, 'total_products'] = X_target.loc[target_mask, 'total_products'] + 1
+X_target.loc[target_mask, 'digital_access'] = 1
+X_target.loc[target_mask, 'no_savings_no_access'] = 0
+X_target.loc[target_mask, 'shock_no_resilience'] = 0
+
+target_after = get_vulnerability(X_target)
+before_target = baseline_scores[target_mask].mean()
+after_target = target_after[target_mask].mean()
+hr_before = (baseline_scores[target_mask] > 70).sum()
+hr_after = (target_after[target_mask] > 70).sum()
 
 print(f"\n  COMBINED INTERVENTION (mobile money + savings + emergency fund):")
-print(f"  Avg vulnerability: {before_tana:.1f} → {after_tana:.1f} (Δ = {after_tana-before_tana:+.1f})")
-print(f"  High-risk people:  {hr_before} → {hr_after} (Δ = {hr_after-hr_before:+d})")
-print(f"  High-risk reduction: {(1 - hr_after/hr_before)*100:.1f}%")
+print(f"  Avg vulnerability: {before_target:.1f} -> {after_target:.1f} (delta = {after_target-before_target:+.1f})")
+if hr_before > 0:
+    print(f"  High-risk people:  {hr_before} -> {hr_after} (delta = {hr_after-hr_before:+d})")
+    print(f"  High-risk reduction: {(1 - hr_after/hr_before)*100:.1f}%")
+else:
+    print(f"  High-risk people:  {hr_before} -> {hr_after}")
 
 print(f"\n{'='*70}")
 print("SIMULATION COMPLETE")

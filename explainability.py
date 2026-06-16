@@ -4,6 +4,9 @@ Run AFTER ml_final.py. Generates:
   1. SHAP beeswarm plots (what drives each prediction)
   2. Financial Vulnerability Index (0-100 score per person)
   3. County-level policy map (which counties need intervention)
+
+FIXED: Uses X_all_final from pipeline_state.pkl (preprocessed, county TE applied)
+       instead of calling load_and_preprocess() which would have raw county column.
 """
 import pandas as pd
 import numpy as np
@@ -13,8 +16,28 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# Load the saved pipeline state from ml_final.py
-X_test, y_test, y_pred, class_names, trained, results, X_full, y_full = joblib.load('pipeline_state.pkl')
+state = joblib.load('pipeline_state.pkl')
+X_test = state['X_test_final']
+y_test = state['y_test']
+y_pred = state['y_pred']
+class_names = state['class_names']
+trained = state['trained']
+test_scores = state['test_scores']
+X_full = state['X_all_final']
+y_full = state['y_full']
+threshold_weights = state['threshold_weights']
+best_name = state['best_name']
+
+df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+
+
+def get_model_predictions(model_name, trained_dict, X_data, threshold_weights=None):
+    model = trained_dict[model_name]
+    probas = model.predict_proba(X_data)
+    if threshold_weights and model_name in threshold_weights:
+        return np.argmax(probas * threshold_weights[model_name], axis=1), probas
+    return model.predict(X_data), probas
+
 
 # ===================================================================
 # 1. SHAP EXPLAINABILITY
@@ -23,24 +46,23 @@ print("=" * 70)
 print("SHAP EXPLAINABILITY")
 print("=" * 70)
 
-# Pick the best CatBoost model for SHAP (it handles multiclass perfectly and won the leaderboard)
-cat_models = {n: s for n, s in results.items() if 'CatBoost' in n}
-shap_name = max(cat_models, key=cat_models.get)
-shap_model = trained[shap_name]
-print(f"Using {shap_name} (F1={cat_models[shap_name]:.4f})")
+cat_model_name = "CatBoost"
+if cat_model_name not in trained:
+    cat_model_name = best_name.replace("+Threshold", "")
 
-# Use 500 random test samples for speed
+shap_model = trained[cat_model_name]
+print(f"Using {cat_model_name} (Test F1={test_scores.get(cat_model_name, 0):.4f})")
+
 X_sample = X_test.sample(n=min(500, len(X_test)), random_state=42)
+
 explainer = shap.TreeExplainer(shap_model)
 shap_values = explainer.shap_values(X_sample)
 
-# Ensure shap_values is handled correctly whether it's a list or a 3D array
 if isinstance(shap_values, np.ndarray) and len(shap_values.shape) == 3:
     shap_list = [shap_values[:, :, i] for i in range(len(class_names))]
 else:
     shap_list = shap_values
 
-# Beeswarm plot for each class
 for i, cls in enumerate(class_names):
     print(f"  Generating SHAP for '{cls}'...")
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -50,7 +72,6 @@ for i, cls in enumerate(class_names):
     plt.savefig(f'shap_{cls.lower().replace(" ", "_")}.png', dpi=150, bbox_inches='tight')
     plt.close()
 
-# Combined bar chart across all classes
 fig, ax = plt.subplots(figsize=(12, 8))
 shap.summary_plot(shap_list, X_sample, class_names=class_names,
                   max_display=15, show=False, plot_type='bar')
@@ -67,20 +88,16 @@ print("\n" + "=" * 70)
 print("FINANCIAL VULNERABILITY INDEX")
 print("=" * 70)
 
-# Get the probability of "Worsened" for EVERY person in the dataset
-# This turns our classifier into a continuous vulnerability score
-from preprocessing import load_and_preprocess
-X_all, y_all, _, _ = load_and_preprocess()
-
-# Use the best XGBoost model to get probabilities
-proba = shap_model.predict_proba(X_all)
+proba = shap_model.predict_proba(X_full)
 worsened_idx = class_names.index('Worsened')
 
-# Scale the "Worsened" probability to 0-100
-vulnerability = (proba[:, worsened_idx] * 100).round(1)
+if best_name in threshold_weights:
+    raw_worsened_prob = (proba * threshold_weights[best_name])[:, worsened_idx]
+else:
+    raw_worsened_prob = proba[:, worsened_idx]
 
-# Load original data for county names
-df_orig = pd.read_csv('finaccess2024_cleaned.csv')
+vulnerability = (raw_worsened_prob / raw_worsened_prob.max() * 100).round(1)
+
 df_orig['vulnerability_score'] = vulnerability
 
 print(f"  Score range: {vulnerability.min():.1f} - {vulnerability.max():.1f}")
@@ -88,7 +105,6 @@ print(f"  Mean score: {vulnerability.mean():.1f}")
 print(f"  People above 70 (High Risk): {(vulnerability > 70).sum()} ({(vulnerability > 70).mean()*100:.1f}%)")
 print(f"  People below 30 (Low Risk): {(vulnerability < 30).sum()} ({(vulnerability < 30).mean()*100:.1f}%)")
 
-# Distribution plot
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.hist(vulnerability, bins=50, color='steelblue', edgecolor='white', alpha=0.85)
 ax.axvline(vulnerability.mean(), color='red', linestyle='--', label=f'Mean: {vulnerability.mean():.1f}')
@@ -129,7 +145,6 @@ print("\nTop 10 Least Vulnerable Counties:")
 for county, row in county_stats.tail(10).iterrows():
     print(f"  {county:<20} {row['avg_vulnerability']:>10.1f} {row['high_risk_pct']:>11.1f}% {row['worsened_rate']*100:>11.1f}% {int(row['population']):>12}")
 
-# Bar chart of county vulnerability
 fig, ax = plt.subplots(figsize=(14, 10))
 colors = ['#d32f2f' if v > 60 else '#ff9800' if v > 50 else '#4caf50'
           for v in county_stats['avg_vulnerability']]
@@ -143,7 +158,6 @@ plt.tight_layout()
 plt.savefig('county_vulnerability.png', dpi=150)
 plt.close()
 
-# Save full county data
 county_stats.to_csv('county_vulnerability.csv')
 df_orig[['county', 'vulnerability_score', 'financial_status']].to_csv('vulnerability_scores.csv', index=False)
 
